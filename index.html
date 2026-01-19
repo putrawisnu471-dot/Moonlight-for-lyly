@@ -1,0 +1,517 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Moonlight for Lyly 🌙</title>
+
+<!-- Fonts -->
+<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500&family=Great+Vibes&display=swap" rel="stylesheet">
+
+<style>
+* { margin:0; padding:0; box-sizing:border-box; }
+
+/* khusus scene 8 boleh scroll */
+.scene.scrollable {
+  overflow-y: auto;
+  padding-bottom: 160px;
+}
+
+body {
+  font-family: 'Poppins', sans-serif;
+  color: #333;
+  overflow: hidden;
+}
+.nav {
+  margin-top: 22px;
+  display: flex;
+  justify-content: center;
+  gap: 16px;
+}
+
+/* 🌌 Background aurora */
+.background {
+  position: fixed;
+  inset: 0;
+  background:
+    radial-gradient(circle at 20% 30%, rgba(180,140,255,0.55), transparent 45%),
+    radial-gradient(circle at 80% 40%, rgba(255,170,210,0.55), transparent 45%),
+    radial-gradient(circle at 50% 80%, rgba(120,180,255,0.45), transparent 50%),
+    linear-gradient(180deg, #0b0b18, #1a0f2e);
+  filter: blur(14px);
+  z-index: -2;
+}
+
+/* Dove overlay */
+.overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(255,255,255,0.35);
+  z-index: -1;
+}
+
+
+/* ✨ Stars */
+.star {
+  width: 2px;
+  height: 2px;
+  background: white;
+  border-radius: 50%;
+  box-shadow: 0 0 12px rgba(255,255,255,0.9);
+  opacity: 0.8;
+  animation: twinkle 2.5s infinite ease-in-out;
+}
+
+@keyframes twinkle {
+  0%, 100% { opacity: 0.3; }
+  50% { opacity: 1; }
+}
+
+/* 🎬 Scene */
+.scene { 
+  display: none; 
+  height: 100vh; 
+  padding: 100px 20px 120px; 
+  text-align: center; 
+}
+
+.scene.active {
+  display: block;
+}
+.creditsScene {
+  height: 100vh;
+  overflow: hidden;
+  padding-top: 100px;
+}
+
+/* 📜 Glass box */
+.box {
+  max-width: 460px;
+  padding: 28px 26px;
+  margin: auto;
+  background: rgba(255,255,255,0.9);
+  border-radius: 14px;
+  box-shadow:
+    0 12px 32px rgba(0,0,0,0.18),
+    inset 0 0 0 1px rgba(255,255,255,0.7);
+}
+
+h2 {
+  font-weight: 300;
+  margin-bottom: 20px;
+}
+
+p {
+  line-height: 1.8;
+  white-space: pre-line;
+}
+
+/* 🎞 Intro Scene */
+.intro {
+  padding-top: 140px;
+}
+
+.intro h1 {
+  font-family: 'Great Vibes', cursive;
+  font-size: 46px;
+}
+
+.subtitle {
+  font-size: 14px;
+  opacity: 0.7;
+  margin-bottom: 40px;
+}
+
+.desc {
+  max-width: 520px;
+  margin: auto;
+  font-size: 14px;
+  line-height: 1.8;
+}
+
+.startBtn {
+  margin-top: 50px;
+  padding: 12px 40px;
+  border-radius: 25px;
+  border: none;
+  background: rgba(255,255,255,0.6);
+  font-family: 'Poppins';
+  cursor: pointer;
+}
+
+
+button {
+  padding: 10px 24px;
+  border-radius: 20px;
+  border: none;
+  background: rgba(255,255,255,0.6);
+  font-family: 'Poppins';
+  cursor: pointer;
+}
+
+/* 🎞 Rolling credits */
+.credits {
+  white-space: pre-line;
+  transform: translateY(100%);
+  animation: roll 8s linear forwards;
+}
+
+/* 🌑 Final Scene */
+.ending {
+  opacity: 0;
+  transform: scale(0.96);
+  animation: endingFade 2.5s ease forwards;
+}
+
+.ending-main {
+  font-family: 'Playfair Display', serif;
+  font-size: 2.2rem;
+  line-height: 1.4;
+  letter-spacing: 0.04em;
+}
+
+.ending-sub {
+  margin-top: 20px;
+  font-size: 1rem;
+  opacity: 0.7;
+  letter-spacing: 0.15em;
+}
+
+@keyframes endingFade {
+  to {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
+.final h1 {
+  font-size: 34px;
+  font-weight: 300;
+  letter-spacing: 1px;
+  margin-bottom: 12px;
+}
+
+.final span {
+  font-size: 16px;
+  opacity: 0.8;
+}
+
+/* 🔊 Music toggle */
+#musicToggle {
+  position: fixed;
+  top: 22px;
+  right: 22px;
+  font-size: 28px;        /* diperbesar */
+  cursor: pointer;
+  opacity: 0.85;
+  z-index: 999;
+}
+
+/* ✨ Animations */
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(20px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+@keyframes roll {
+  from { transform: translateY(120%); }
+  to { transform: translateY(-220%); }
+}
+</style>
+</head>
+
+<body>
+
+<div class="background"></div>
+<div class="overlay"></div>
+<div class="moon"></div>
+<div id="musicToggle">🔊</div>
+
+<!-- Stars -->
+<script>
+for(let i=0;i<40;i++){
+  const s=document.createElement('div');
+  s.className='star';
+  s.style.top=Math.random()*100+'%';
+  s.style.left=Math.random()*100+'%';
+  document.body.appendChild(s);
+}
+</script>
+
+<!-- Audio -->
+<audio id="introMusic" src="assets/Moonlight-calm.mp3" loop></audio>
+<audio id="bgMusic" src="assets/LANY - you!.mp3" loop></audio>
+
+<!-- Scenes -->
+<div class="scene intro active">
+  <h1>moonlight for lyly</h1>
+  <p class="subtitle">— versi pribadi dari Wisnu</p>
+  <p class="desc">
+    “a quiet space where i talk to you when the world is asleep.”<br><br>
+    for the nights when i miss you most —<br>
+    moonlight for lyly.
+  </p>
+  <button class="startBtn" onclick="startStory()">Start</button>
+</div>
+
+<div class="scene">
+  <div class="box">
+    <h2>— 1 —</h2>
+    <p>Untuk kamu,
+yang hari ini bertambah usia,
+dan diam-diam sudah melewati begitu banyak hal.
+Tulisan ini bukan tentang seberapa kuat kamu terlihat,
+tapi tentang betapa jauhnya kamu sudah berjalan.</p></div>
+
+    <div class="nav">
+      <button onclick="next()">Next</button>
+    </div>
+  </div>
+</div>
+
+<div class="scene">
+  <div class="box">
+    <h2>— 2 —</h2>
+    <p>
+      Sejak kecil, hidup tidak selalu memilih jalan yang mudah untukmu.
+Ada keadaan yang menuntutmu tumbuh lebih cepat,
+belajar mengerti sebelum sempat dimengerti.
+Namun kamu tetap bertumbuh —
+dengan hati yang lembut,
+meski dunia sering kali keras.
+    </p></div>
+
+    <div class="nav">
+      <button onclick="prev()">Back</button>
+      <button onclick="next()">Next</button>
+    </div>
+  </div>
+</div>
+
+<div class="scene">
+  <div class="box">
+    <h2>— 3 —</h2>
+    <p>
+      Hari ini, langkahmu masih berlanjut.
+Ada hari-hari yang terasa panjang,
+tanggung jawab yang datang silih berganti,
+pikiran yang tak selalu tenang,
+dan perasaan lelah yang kadang sulit dijelaskan.
+Jika hidup terasa berat belakangan ini,
+itu bukan karena kamu lemah —
+itu karena kamu sedang berjalan sungguh-sungguh.
+    </p></div>
+
+    <div class="nav">
+      <button onclick="prev()">Back</button>
+      <button onclick="next()">Next</button>
+    </div>
+  </div>
+</div>
+
+<div class="scene">
+  <div class="box">
+    <h2>— 4 —</h2>
+    <p>
+      Kadang dunia lupa memberi apresiasi,
+tapi aku tidak.
+Aku melihat caramu bertahan,
+bahkan saat hatimu ingin berhenti sebentar.
+Kamu tidak berlebihan,
+kamu hanya manusia yang sedang memikul banyak hal.
+    </p></div>
+
+    <div class="nav">
+      <button onclick="prev()">Back</button>
+      <button onclick="next()">Next</button>
+    </div>
+  </div>
+</div>
+
+<div class="scene scrollable">
+  <div class="box">
+    <h2>— 5 —</h2>
+    <p>
+      Caramu berpikir, caramu berbicara, caramu bersikap —
+semuanya meninggalkan arti.
+
+Aku salah satu orang yang merasakan dampaknya.
+Lewat caramu melihat hidup,
+aku belajar lebih berdamai dengan diriku sendiri,
+meski belum sepenuhnya.
+Lewat caramu bertahan,
+aku punya gambaran tentang masa depan
+yang terasa lebih tenang dan masuk akal.
+
+Tanpa kamu sadari,
+kehadiranmu mengubah lebih banyak hal
+dari yang bisa kamu lihat.
+    </p></div>
+
+    <div class="nav">
+      <button onclick="prev()">Back</button>
+      <button onclick="next()">Next</button>
+    </div>
+  </div>
+</div>
+
+<div class="scene">
+  <div class="box">
+    <h2>— 6 —</h2>
+    <p>
+      Di antara semua hari yang terasa berat itu,
+ingat satu hal ini, pelan-pelan saja:
+kamu gak sendirian, aku di sini.
+
+Bukan untuk menuntut kamu selalu kuat,
+tapi untuk menemani kamu berjalan,
+sepelan apa pun langkahmu.
+    </p></div>
+
+    <div class="nav">
+      <button onclick="prev()">Back</button>
+      <button onclick="next()">Next</button>
+    </div>
+  </div>
+</div>
+
+<div class="scene">
+  <div class="box">
+    <h2>— 7 —</h2>
+    <p>
+      Aku menitipkan kamu dalam doaku.
+Semoga Tuhan melancarkan setiap langkahmu,
+menguatkan hatimu saat dunia terasa terlalu bising,
+dan memberi kamu ketenangan
+yang selama ini kamu perjuangkan.
+    </p></div>
+
+    <div class="nav">
+      <button onclick="prev()">Back</button>
+      <button onclick="next()">Next</button>
+    </div>
+  </div>
+</div>
+
+<div class="scene scrollable">
+  <div class="box">
+    <h2>— 8 —</h2>
+    <p>
+      Happy birthday, sayang.
+Terima kasih sudah bertahan sejauh ini,
+dengan segala versimu,
+meski tidak semua harimu mudah.
+
+Terima kasih sudah tetap menjadi dirimu,
+bahkan saat dunia tidak selalu lembut.
+
+Semoga tahun ini lebih ringan untukmu.
+Lebih banyak senyum yang tulus,
+lebih sedikit beban di kepala,
+dan lebih banyak hari
+di mana kamu merasa cukup dan dicintai.
+
+Semoga apa pun yang kamu cita-citakan,
+dan semua yang selama ini kamu perjuangkan,
+pelan-pelan menemukan jalannya dan terwujud di tahun ini.
+
+Aku bangga punya kamu.
+I love you, ly 💗
+    </p></div>
+
+    <div class="nav">
+      <button onclick="prev()">Back</button>
+      <button onclick="next()">Next</button>
+    </div>
+  </div>
+</div>
+
+<div class="scene creditsScene">
+  <div class="credits">
+Warna, lagu dan filosofi
+
+Filosofi warna:
+💜 Ungu : Xavier, karakter yang kamu cintai. Kuat, setia, dan penuh makna.
+💗 Pink : kamu. Tegas di luar, tapi selembut senja di dalam.
+💙 Biru : aku. Tenang, hanya ingin pastiin kamu aman dan bahagia.
+
+Tiga warna yang kalau digabung,
+jadi langit malam tempat kamu bersinar.
+
+Filosofi lagu:
+you! - LANY
+seperti katamu — aku itu tanpa kamu ga akan bisa perfect,
+aku butuh sesuatu yg bisa melengkapi aku.
+  </div>
+</div>
+
+<div class="scene scene-10">
+  <div class="ending">
+    <p class="ending-main">
+      and you complete me<br>
+      in ways i never thought possible.
+    </p>
+    <p class="ending-sub">
+      — from me, under the same moon. —
+    </p>
+  </div>
+</div>
+
+
+<script>
+let index = 0;
+const scenes = document.querySelectorAll('.scene');
+const nav = document.querySelector('.nav');
+const introMusic = document.getElementById('introMusic');
+const bgMusic = document.getElementById('bgMusic');
+const toggle = document.getElementById('musicToggle');
+
+introMusic.volume = 0.4;
+bgMusic.volume = 0.6;
+
+introMusic.play().catch(()=>{});
+
+function show(){
+  scenes.forEach(s => s.classList.remove('active'));
+  scenes[index].classList.add('active');
+
+  // auto lanjut dari credits ke final
+  if(scenes[index].classList.contains('creditsScene')){
+    setTimeout(() => {
+      index++;
+      show();
+    }, 8000);
+  }
+}
+
+function startStory(){
+  introMusic.pause();
+  introMusic.currentTime=0;
+  bgMusic.play().catch(()=>{});
+  index=1;
+  show();
+}
+
+function next(){
+  if(index<scenes.length-1){ index++; show(); }
+}
+
+function prev(){
+  if(index>1){ index--; show(); }
+}
+
+toggle.onclick=()=>{
+  if(bgMusic.paused){
+    bgMusic.play().catch(()=>{});
+    toggle.textContent='🔊';
+  } else {
+    bgMusic.pause();
+    toggle.textContent='🔇';
+  }
+};
+
+show();
+</script>
+
+</body>
+</html>
