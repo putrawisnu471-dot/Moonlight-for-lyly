@@ -11,6 +11,23 @@
 <style>
 * { margin:0; padding:0; box-sizing:border-box; }
 
+/* CSS kamu yang lain di atas */
+
+/* 👆 tambahin INI */
+#tap-screen {
+  position: fixed;
+  inset: 0;
+  background: black;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: white;
+  font-size: 22px;
+  z-index: 9999;
+  cursor: pointer;
+}
+<style>  
+  
 /* khusus scene 8 boleh scroll */
 .scene.scrollable {
   overflow-y: auto;
@@ -222,6 +239,10 @@ button {
 
 <body>
 
+<div id="tap-screen">
+  <p>Tap to start 🌙</p>
+</div>
+  
 <div class="background"></div>
 <div class="overlay"></div>
 <div class="moon"></div>
@@ -513,5 +534,7 @@ toggle.onclick=()=>{
 show();
 </script>
 
+
 </body>
 </html>
+
